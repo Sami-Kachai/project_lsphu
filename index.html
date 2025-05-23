@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>project lsphu</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=UnifrakturCook:wght@700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        background-color: #0e0e10;
+        color: #e0dada;
+        font-family: 'UnifrakturCook', cursive;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        height: 100vh;
+        margin: 0;
+        padding: 2rem;
+        background-image: radial-gradient(
+          circle,
+          rgba(255, 255, 255, 0.03) 1px,
+          transparent 1px
+        );
+        background-size: 40px 40px;
+      }
+
+      h1 {
+        font-size: 3rem;
+        margin-bottom: 0.5rem;
+        text-shadow: 0 0 5px #a000a0;
+      }
+
+      .message {
+        font-size: 1.2rem;
+        max-width: 600px;
+        text-align: center;
+        margin-bottom: 1rem;
+      }
+
+      .player-container {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid #555;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 0 20px rgba(160, 0, 160, 0.4);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 2rem;
+      }
+
+      audio {
+        width: 300px;
+        outline: none;
+      }
+
+      .morse-graph {
+        max-width: 600px;
+        border: 1px solid #333;
+        border-radius: 12px;
+        box-shadow: 0 0 12px rgba(100, 0, 100, 0.4);
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Ink of the Revenant</h1>
+    <p class="message">"The ink hums faintly — some will hear."</p>
+    <div class="player-container">
+      <audio controls>
+        <source
+          src="de37880b-efa7-4a40-8cb7-b64d67bc56f8.wav"
+          type="audio/wav"
+        />
+        Your browser does not support the audio element.
+      </audio>
+    </div>
+    <img
+      src="de37880b-efa7-4a40-8cb7-b64d67bc56f8.png"
+      alt="de37880b-efa7-4a40-8cb7-b64d67bc56f8"
+      class="morse-graph"
+    />
+  </body>
+</html>
