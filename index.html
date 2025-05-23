@@ -5,96 +5,633 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>▀ ▄▀▀ l▄▀ ▄▀hu</title>
     <style>
+      @keyframes glitchRed {
+        0%,
+        95%,
+        100% {
+          opacity: 0;
+        }
+        96%,
+        97% {
+          background: repeating-linear-gradient(0deg, #f00, #f00 1px, #000 2px);
+          opacity: 0.9;
+        }
+      }
+      @keyframes glitchColor {
+        0%,
+        97%,
+        100% {
+          opacity: 0;
+        }
+        98%,
+        99% {
+          background: repeating-linear-gradient(90deg, #0f0, #00f, #f0f, #ff0);
+          opacity: 0.9;
+        }
+      }
+      @keyframes glitchStatic {
+        0%,
+        95%,
+        100% {
+          opacity: 0;
+        }
+        96% {
+          background: url('https://media.giphy.com/media/oEI9uBYSzLpBK/giphy.gif')
+            center center / cover;
+          opacity: 0.5;
+        }
+        97% {
+          opacity: 0;
+        }
+      }
+      @keyframes flicker {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.2;
+        }
+      }
+      @keyframes floatGlyphs {
+        0% {
+          opacity: 0;
+          transform: translateY(0);
+        }
+        50% {
+          opacity: 1;
+          transform: translateY(-10px);
+        }
+        100% {
+          opacity: 0;
+          transform: translateY(-20px);
+        }
+      }
+
       body {
-        background-color: #0e0e10;
-        color: #e0dada;
-        font-family: Arial, Helvetica, sans-serif;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: flex-start;
-        height: 100vh;
+        background-color: #0f0f0f;
+        color: #f8f8f8;
+        font-family: 'Georgia', serif;
         margin: 0;
         padding: 2rem;
-        background-image: radial-gradient(
-          circle,
-          rgba(255, 255, 255, 0.03) 1px,
-          transparent 1px
-        );
-        background-size: 40px 40px;
+        overflow-x: hidden;
+        position: relative;
       }
 
-      h1 {
-        font-size: 3rem;
-        margin-bottom: 0.5rem;
-        text-shadow: 0 0 5px white;
-      }
-
-      .message {
-        font-size: 1.2rem;
-        max-width: 600px;
+      h1,
+      h2 {
+        color: #c1b57b;
         text-align: center;
-        margin-bottom: 1rem;
-        color:red;
+        animation: flicker 3s infinite alternate;
       }
 
-      .player-container {
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid #555;
-        border-radius: 12px;
-        padding: 2rem;
-        box-shadow: 0 0 20px white;
+      .error-text {
+        font-family: monospace;
+        color: red;
+        font-size: 1rem;
+        margin: 1rem;
+        text-align: center;
+      }
+
+      .audio-container {
         display: flex;
-        flex-direction: column;
+        justify-content: center;
+        margin: 2rem 0;
+      }
+
+      .audio-player {
+        width: 300px;
+        background: #1a1a1a;
+        border: 2px solid #c1b57b;
+        padding: 1rem;
+        display: flex;
         align-items: center;
-        margin-bottom: 2rem;
+        justify-content: center;
       }
 
       audio {
-        width: 300px;
+        width: 100%;
+        height: 40px;
+        background: transparent;
+        border: none;
         outline: none;
+        border-radius: 0;
+        filter: invert(1);
+        padding: 0;
+        margin: 0;
       }
 
-      .morse-graph {
-        max-width: 600px;
-        border: 1px solid #333;
-        border-radius: 12px;
-        box-shadow: 0 0 12px white;
+      .carousel.dragging {
+        cursor: grabbing;
+        user-select: none;
+      }
+
+      .carousel {
+        display: flex;
+        overflow-x: auto;
+        gap: 1rem;
+        scroll-snap-type: x mandatory;
+        padding: 1rem 0;
+        scroll-behavior: smooth;
+        cursor: grab;
+      }
+
+      .carousel::-webkit-scrollbar {
+        height: 8px;
+      }
+      .carousel::-webkit-scrollbar-thumb {
+        background: #444;
+        border-radius: 4px;
+      }
+      .carousel-item {
+        flex: 0 0 calc(20% - 1rem);
+        scroll-snap-align: start;
+        box-sizing: border-box;
+      }
+      .carousel-item img {
+        width: 100%;
+        height: auto;
+        border: 2px solid #333;
+        border-radius: 6px;
+        pointer-events: auto;
+        user-select: none;
+      }
+
+      .carousel-item .caption {
+        color: #aaa;
+        cursor: pointer;
+      }
+
+      .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: rgba(0, 0, 0, 0.98);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        z-index: 9999;
+      }
+
+      .modal-caption {
+        color: #c1b57b;
+        font-size: 1rem;
+        margin-top: 1rem;
+        text-align: center;
+        font-style: italic;
+      }
+
+      .modal img {
+        max-width: 80vw;
+        max-height: 80vh;
+        margin-bottom: 1rem;
+      }
+
+      .modal-controls {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+      }
+
+      .modal-controls .close-btn {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 2rem;
+        cursor: pointer;
+      }
+
+      .arrow {
+        position: absolute;
+        top: 50%;
+        font-size: 2rem;
+        background: none;
+        border: none;
+        color: #f8f8f8;
+        cursor: pointer;
+        transform: translateY(-50%);
+        z-index: 10001;
+      }
+
+      #prev {
+        left: 2rem;
+      }
+      #next {
+        right: 2rem;
+      }
+
+      .glitch-overlay-red {
+        animation: glitchRed 24s infinite;
+      }
+
+      .glitch-overlay-color {
+        animation: glitchColor 36s infinite;
+      }
+
+      .glitch-overlay-static {
+        animation: glitchStatic 18s infinite;
+      }
+
+      .glitch-overlay-red,
+      .glitch-overlay-color,
+      .glitch-overlay-static {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        opacity: 0;
+        pointer-events: none;
+        z-index: 10000;
+      }
+
+      .floating-glyphs span {
+        position: absolute;
+        color: #c1b57b44;
+        font-size: 1.4rem;
+        font-family: monospace;
+        animation: floatGlyphs 6s infinite ease-in-out;
+      }
+
+      .floating-glyphs {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        pointer-events: none;
+        z-index: 999;
+      }
+
+      footer {
+        text-align: center;
+        font-size: 0.9rem;
+        margin-top: 4rem;
+        color: #777;
+      }
+
+      @media (max-width: 600px) {
+        body {
+          padding: 1rem;
+        }
+        .audio-player {
+          width: 90vw;
+        }
+        .modal img {
+          max-width: 90vw;
+          max-height: 60vh;
+        }
+        .carousel-item {
+          width: 45vw;
+        }
       }
     </style>
   </head>
   <body>
-    <h1>█████████████████ant</h1>
-    <p class="message">
-        Uncaught TypeError: Cannot read property 'ink' of undefined
-        at Object.someFunction (app.js:52)
-        at processData (utils.js:18)
-        at calculateData (calculator.js:101)
-        at mainApp (index.js:33)
-        at HTMLButtonElement.onclick (index.js:19)
-        at runTask (taskRunner.js:72)
-        at someOtherFunction (misc.js:15)
-        at main (app.js:4)
-        at <anonymous> (app.js:100)
-        at executeTask (taskManager.js:45)
-        at stepThrough (stepper.js:89)
-        at <anonymous> (helper.js:3)
-        at eventHandler (ui.js:210)
-    </p>
-    <br />
-    <div class="player-container">
-      <audio controls>
-        <source
-          src="de37880b-efa7-4a40-8cb7-b64d67bc56f8.wav"
-          type="audio/wav"
-        />
-        Your browser does not support the audio element.
-      </audio>
+    <div class="glitch-overlay-red"></div>
+    <div class="glitch-overlay-color"></div>
+    <div class="glitch-overlay-static"></div>
+
+    <div class="floating-glyphs">
+      <span style="top: 5%; left: 15%">∇</span>
+      <span style="top: 20%; left: 45%">ψ</span>
+      <span style="top: 35%; left: 75%">ʘ</span>
+      <span style="top: 50%; left: 25%">⍰</span>
+      <span style="top: 65%; left: 60%">⊗</span>
+      <span style="top: 80%; left: 35%">≡</span>
+      <span style="top: 90%; left: 10%">λ</span>
     </div>
+
+    <h1>I▒▒░░ ⚝⚚⚰⸸☍⟁⚯ ║║║Ẋ̶̢̢̩̰̔̅͐X̸͈̠̪͆̾̑͂͝X̶͙͆X̵̯͑X̷̢̠̽nant</h1>
     <img
-      src="de37880b-efa7-4a40-8cb7-b64d67bc56f8.png"
-      alt="de37880b-efa7-4a40-8cb7-b64d67bc56f8"
-      class="morse-graph"
+      src="./assets/images/de37880b-efa7-4a40-8cb7-b64d67bc56f9.png"
+      alt="de37880b-efa7-4a40-8cb7-b64d67bc56f9.png"
+      style="
+        display: block;
+        margin: 1rem auto;
+        max-width: 300px;
+        border: 2px solid #333;
+      "
     />
+    <h2>A ⟁⟁vel▒▒░░. K⚝ch⚝i</h2>
+
+    <div class="error-text">ERROR // 011: rewrite protocol failed</div>
+    <div class="error-text">FATAL EXCEPTION IN THREAD: [cell13.inmate.ink]</div>
+    <div class="error-text">
+      INTEGRITY VIOLATION — MEMORY CORRUPTION DETECTED
+    </div>
+
+    <div class="audio-container">
+      <div class="audio-player">
+        <audio controls>
+          <source
+            src="de37880b-efa7-4a40-8cb7-b64d67bc56f8.wav"
+            type="audio/mpeg"
+          />
+          Your browser does not support the audio element.
+        </audio>
+      </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 1rem">
+      <img
+        src="./assets/images/de37880b-efa7-4a40-8cb7-b64d67bc56f8.png"
+        alt="de37880b-efa7-4a40-8cb7-b64d67bc56f8.png"
+        style="max-width: 50%; border: 1px solid #444; margin-bottom: 1rem"
+      />
+      <div style="color: #c1b57b; margin-bottom: 0.5rem">
+        Go Ahead, Pretend You Know ░░░░
+      </div>
+      <input
+        type="text"
+        id="morseInput"
+        placeholder="Go on, impress me..."
+        style="
+          padding: 0.5rem;
+          width: 100%;
+          max-width: 400px;
+          background: #111;
+          border: 1px solid #444;
+          color: #f8f8f8;
+        "
+      />
+      <div
+        id="morseOutput"
+        style="
+          margin-top: 1rem;
+          font-family: monospace;
+          color: #aaa;
+          word-wrap: break-word;
+        "
+      ></div>
+    </div>
+
+    <div class="carousel" id="carousel">
+      <div class="carousel-item">
+        <img
+          src="./assets/images/de37880b-efa7-4a40-8cb7-b64d67bc56f10.png"
+          alt="de37880b-efa7-4a40-8cb7-b64d67bc56f10.png"
+        />
+        <div class="caption"></div>
+      </div>
+      <div class="carousel-item">
+        <img
+          src="./assets/images/de37880b-efa7-4a40-8cb7-b64d67bc56f11.png"
+          alt="de37880b-efa7-4a40-8cb7-b64d67bc56f11.png"
+        />
+        <div class="caption"></div>
+      </div>
+      <div class="carousel-item">
+        <img
+          src="./assets/images/de37880b-efa7-4a40-8cb7-b64d67bc56f12.png"
+          alt="de37880b-efa7-4a40-8cb7-b64d67bc56f12.png"
+        />
+        <div class="caption"></div>
+      </div>
+      <div class="carousel-item">
+        <img
+          src="./assets/images/de37880b-efa7-4a40-8cb7-b64d67bc56f13.png"
+          alt="de37880b-efa7-4a40-8cb7-b64d67bc56f13.png"
+        />
+        <div class="caption"></div>
+      </div>
+      <div class="carousel-item">
+        <img
+          src="./assets/images/de37880b-efa7-4a40-8cb7-b64d67bc56f15.png"
+          alt="de37880b-efa7-4a40-8cb7-b64d67bc56f15.png"
+        />
+        <div class="caption"></div>
+      </div>
+      <div class="carousel-item">
+        <img
+          src="./assets/images/de37880b-efa7-4a40-8cb7-b64d67bc56f16.png"
+          alt="de37880b-efa7-4a40-8cb7-b64d67bc56f16.png"
+        />
+        <div class="caption"></div>
+      </div>
+      <div class="carousel-item">
+        <img
+          src="./assets/images/de37880b-efa7-4a40-8cb7-b64d67bc56f17.png"
+          alt="de37880b-efa7-4a40-8cb7-b64d67bc56f17.png"
+        />
+        <div class="caption"></div>
+      </div>
+      <div class="carousel-item">
+        <img
+          src="./assets/images/de37880b-efa7-4a40-8cb7-b64d67bc56f18.png"
+          alt="de37880b-efa7-4a40-8cb7-b64d67bc56f18.png"
+        />
+        <div class="caption"></div>
+      </div>
+      <div class="carousel-item">
+        <img
+          src="./assets/images/de37880b-efa7-4a40-8cb7-b64d67bc56f20.png"
+          alt="de37880b-efa7-4a40-8cb7-b64d67bc56f20.png"
+        />
+        <div class="caption"></div>
+      </div>
+      <div class="carousel-item">
+        <img
+          src="./assets/images/de37880b-efa7-4a40-8cb7-b64d67bc56f22.png"
+          alt="de37880b-efa7-4a40-8cb7-b64d67bc56f22.png"
+        />
+        <div class="caption"></div>
+      </div>
+    </div>
+
+    <div class="modal" id="modal">
+      <button class="arrow" id="prev">&#9664;</button>
+      <img id="modal-img" src="" alt="Artwork" />
+      <div id="modal-caption" class="modal-caption"></div>
+      <button class="arrow" id="next">&#9654;</button>
+      <div class="modal-controls">
+        <button class="close-btn" id="close">&times;</button>
+      </div>
+    </div>
+
+    <footer>&copy; 2025 S. Kachai. All rights reserved.</footer>
+
+    <script>
+      const items = document.querySelectorAll('.carousel-item img');
+      const modal = document.getElementById('modal');
+      const modalImg = document.getElementById('modal-img');
+      const closeBtn = document.getElementById('close');
+      const nextBtn = document.getElementById('next');
+      const prevBtn = document.getElementById('prev');
+      const captions = document.querySelectorAll('.carousel-item .caption');
+
+      (function () {
+        const carousel = document.getElementById('carousel');
+        let isDown = false;
+        let startX;
+        let scrollLeft;
+        let dragMoved = false;
+
+        carousel.addEventListener('mousedown', (e) => {
+          isDown = true;
+          dragMoved = false;
+          carousel.classList.add('dragging');
+          startX = e.pageX - carousel.offsetLeft;
+          scrollLeft = carousel.scrollLeft;
+        });
+
+        carousel.addEventListener('mouseleave', () => {
+          isDown = false;
+          carousel.classList.remove('dragging');
+        });
+
+        carousel.addEventListener('mouseup', () => {
+          isDown = false;
+          carousel.classList.remove('dragging');
+        });
+
+        carousel.addEventListener('mousemove', (e) => {
+          if (!isDown) return;
+          e.preventDefault();
+          dragMoved = true;
+          const x = e.pageX - carousel.offsetLeft;
+          const walk = (x - startX) * 1.5;
+          carousel.scrollLeft = scrollLeft - walk;
+        });
+
+        const images = carousel.querySelectorAll('img');
+        images.forEach((img) => {
+          img.addEventListener('click', (e) => {
+            if (dragMoved) {
+              e.stopImmediatePropagation();
+              return false;
+            }
+          });
+        });
+      })();
+
+      document.querySelectorAll('.carousel img').forEach((img) => {
+        img.setAttribute('draggable', 'false');
+      });
+
+      let currentIndex = 0;
+      const originalTexts = [
+        'Hey, You!',
+        'Bet it tastes better than your life',
+        'Why the long faces ?',
+        'Maestro, sad music, please!',
+        'Are you going to clean that up ?',
+        "C'mon! stop being a drama queen!",
+        'I spent 12€ on this sandwich',
+        "I guess you will have to get a new dishwasher now, don't you?",
+        'Guess who just won the worst dad of the year award?',
+        'Wanna play Bartita?',
+      ];
+
+      const encrypted = () => `Ë̵͉͚Ȑ̶͓ͅR̴͉̎̾͂O̶͕͚̐̾̐͜R̸͕̬͐͛̎ `.repeat(8).trim();
+
+      captions.forEach((caption, i) => {
+        caption.textContent = encrypted();
+        caption.addEventListener('click', () => {
+          caption.textContent = originalTexts[i];
+          setTimeout(() => {
+            caption.textContent = encrypted();
+          }, 2000);
+        });
+      });
+
+      const showImage = (index) => {
+        const img = items[index];
+        modalImg.src = img.src;
+
+        const originalText = originalTexts[index];
+        document.getElementById('modal-caption').textContent = originalText;
+
+        currentIndex = index;
+        modal.style.display = 'flex';
+      };
+
+      items.forEach((img, index) => {
+        img.addEventListener('click', () => showImage(index));
+      });
+
+      closeBtn.addEventListener('click', () => {
+        modal.style.display = 'none';
+      });
+
+      nextBtn.addEventListener('click', () => {
+        currentIndex = (currentIndex + 1) % items.length;
+        showImage(currentIndex);
+      });
+
+      prevBtn.addEventListener('click', () => {
+        currentIndex = (currentIndex - 1 + items.length) % items.length;
+        showImage(currentIndex);
+      });
+
+      const reverseMorseMap = {
+        '.-': 'A',
+        '-...': 'B',
+        '-.-.': 'C',
+        '-..': 'D',
+        '.': 'E',
+        '..-.': 'F',
+        '--.': 'G',
+        '....': 'H',
+        '..': 'I',
+        '.---': 'J',
+        '-.-': 'K',
+        '.-..': 'L',
+        '--': 'M',
+        '-.': 'N',
+        '---': 'O',
+        '.--.': 'P',
+        '--.-': 'Q',
+        '.-.': 'R',
+        '...': 'S',
+        '-': 'T',
+        '..-': 'U',
+        '...-': 'V',
+        '.--': 'W',
+        '-..-': 'X',
+        '-.--': 'Y',
+        '--..': 'Z',
+        '-----': '0',
+        '.----': '1',
+        '..---': '2',
+        '...--': '3',
+        '....-': '4',
+        '.....': '5',
+        '-....': '6',
+        '--...': '7',
+        '---..': '8',
+        '----.': '9',
+        '/': ' ',
+      };
+
+      const morseInput = document.getElementById('morseInput');
+      const morseOutput = document.getElementById('morseOutput');
+
+      function normalizeSymbol(symbol) {
+        if (symbol === '—' || symbol === '——') return '--';
+        if (symbol === '—-' || symbol === '——-') return '---';
+        return symbol
+          .replace(/[–—―−‒]/g, '-')
+          .replace(/[｜¦|]/g, '/')
+          .replace(/[^.\-/]/g, '');
+      }
+
+      if (morseInput && morseOutput) {
+        morseInput.addEventListener('input', () => {
+          const raw = morseInput.value.trim().replace(/ +/g, ' ');
+          const decoded = raw
+            .split(' ')
+            .map((s) => {
+              const fixed = normalizeSymbol(s);
+              return reverseMorseMap[fixed] || '?';
+            })
+            .join('');
+          morseOutput.innerHTML = decoded.replace(/ELIAN/g, '<s>ELIAN</s>');
+        });
+      }
+    </script>
   </body>
 </html>
