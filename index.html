@@ -352,26 +352,30 @@
     const lockScreen = document.getElementById('lock-screen');
     const unlockInput = document.getElementById('unlockInput');
 
-    unlockInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        const value = unlockInput.value
-          .trim()
-          .toLowerCase()
-          .replace(/\s*\.\s*/, '.');
-        if (value === 'they did it.she knew') {
-          lockScreen.style.display = 'none';
-        } else {
-          unlockInput.value = '';
-          document.getElementById('unlock-error').style.display = 'block';
-          unlockInput.style.border = '1px solid red';
-          setTimeout(() => {
-            unlockInput.placeholder =
-              'Enter that thing you definitely missed...';
-            unlockInput.style.border = '1px solid #444';
-          }, 2000);
-        }
+    function tryUnlock() {
+      const value = unlockInput.value
+        .trim()
+        .toLowerCase()
+        .replace(/\s*\.\s*/, '.');
+      if (value === 'they did it.she knew') {
+        lockScreen.style.display = 'none';
+      } else {
+        unlockInput.value = '';
+        document.getElementById('unlock-error').style.display = 'block';
+        unlockInput.style.border = '1px solid red';
+        setTimeout(() => {
+          document.getElementById('unlock-error').style.display = 'none';
+          unlockInput.placeholder = 'Enter the phrase...';
+          unlockInput.style.border = '1px solid #444';
+        }, 2000);
       }
+    }
+
+    unlockInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') tryUnlock();
     });
+
+    unlockInput.addEventListener('change', tryUnlock);
   </script>
   <body>
     <div class="glitch-overlay-red"></div>
