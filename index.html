@@ -69,6 +69,17 @@
         }
       }
 
+      @keyframes shuffleIn {
+        0% {
+          transform: translateY(-10px);
+          opacity: 0;
+        }
+        100% {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+
       body {
         background-color: #0f0f0f;
         color: #f8f8f8;
@@ -84,6 +95,7 @@
         color: #c1b57b;
         text-align: center;
         animation: flicker 3s infinite alternate;
+        font-style: normal;
       }
 
       .error-text {
@@ -92,6 +104,7 @@
         font-size: 1rem;
         margin: 1rem;
         text-align: center;
+        font-style: normal;
       }
 
       .audio-container {
@@ -271,6 +284,187 @@
         z-index: 999;
       }
 
+      /* Main archive section */
+      #lost-signals-archive {
+        background-color: #0f0f0f;
+        color: #f8f8f8;
+        font-family: 'Georgia', serif;
+        padding: 2rem;
+        margin-top: 3rem;
+        border-top: 2px solid #c1b57b;
+      }
+
+      #lost-signals-archive h2 {
+        color: #c1b57b;
+        text-align: center;
+        font-family: 'Georgia', serif;
+        animation: flicker 3s infinite alternate;
+        margin-bottom: 1rem;
+      }
+
+      #lost-signals-archive p {
+        color: #aaa;
+        text-align: center;
+        font-style: italic;
+        margin-bottom: 2rem;
+        font-family: monospace;
+      }
+
+      /* Puzzle grid */
+      .puzzle-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1.5rem;
+      }
+
+      .puzzle-card {
+        background: #1a1a1a;
+        border: 2px solid #333;
+        border-radius: 6px;
+        padding: 1rem;
+        cursor: pointer;
+        transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s,
+          opacity 0.3s;
+        text-align: center;
+        position: relative;
+      }
+
+      .puzzle-card img {
+        width: 100%;
+        height: auto;
+        border: 2px solid #333;
+        border-radius: 4px;
+        filter: grayscale(35%) contrast(1.2);
+        margin-bottom: 0.5rem;
+      }
+
+      .puzzle-card h3 {
+        color: #c1b57b;
+        font-size: 1rem;
+        margin: 0.5rem 0 0;
+        font-family: monospace;
+      }
+
+      .puzzle-card:hover {
+        transform: scale(1.05);
+        box-shadow: 0 0 12px #c1b57b66;
+        border-color: #c1b57b;
+      }
+
+      .puzzle-card.completed {
+        opacity: 0.6;
+        border-color: #c1b57b;
+      }
+
+      .puzzle-card.completed .puzzle-status {
+        color: #c1b57b;
+        font-family: monospace;
+        font-size: 0.9rem;
+        margin-top: 0.5rem;
+      }
+
+      #puzzle-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: rgba(0, 0, 0, 0.98);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        z-index: 9999;
+        font-family: monospace;
+      }
+
+      #puzzle-modal:not(.hidden) {
+        display: flex;
+      }
+
+      .modal-content {
+        background: #1a1a1a;
+        border: 2px solid #c1b57b;
+        padding: 2rem;
+        max-width: 500px;
+        width: 90%;
+        color: #f8f8f8;
+        position: relative;
+        text-align: center;
+      }
+
+      #close-modal {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: none;
+        border: none;
+        color: #c1b57b;
+        font-size: 2rem;
+        cursor: pointer;
+      }
+
+      #puzzle-container input {
+        background: #0f0f0f;
+        border: 1px solid #c1b57b;
+        color: #f8f8f8;
+        padding: 0.5rem;
+        margin: 1rem 0;
+        width: 80%;
+        font-family: monospace;
+      }
+
+      #puzzle-container button {
+        background: #1a1a1a;
+        border: 2px solid #c1b57b;
+        color: #c1b57b;
+        padding: 0.5rem 1rem;
+        cursor: pointer;
+        transition: background 0.3s, color 0.3s;
+        font-family: monospace;
+      }
+
+      #puzzle-container button:hover {
+        background: #c1b57b;
+        color: #0f0f0f;
+      }
+
+      #download-link {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+        margin-top: 2rem;
+        font-family: monospace;
+        font-size: 1.2rem;
+      }
+
+      #download-link.hidden {
+        display: none;
+      }
+
+      #download-link a {
+        color: #c1b57b;
+        text-decoration: none;
+        border: 2px solid #c1b57b;
+        padding: 0.5rem 1rem;
+        display: inline-block;
+        transition: background 0.3s, color 0.3s;
+      }
+
+      #download-link a:hover {
+        background: #c1b57b;
+        color: #0f0f0f;
+      }
+
+      #qr-code img {
+        filter: brightness(0.8) invert(1);
+        opacity: 0.8;
+        border: 1px dashed #c1b57b;
+        padding: 0.5rem;
+        background: #0f0f0f;
+      }
+
       footer {
         text-align: center;
         font-size: 0.9rem;
@@ -376,6 +570,10 @@
     const lockScreen = document.getElementById('lock-screen');
     const unlockInput = document.getElementById('unlockInput');
 
+    if (localStorage.getItem('siteUnlocked') === 'true') {
+      lockScreen.style.display = 'none';
+    }
+
     function tryUnlock() {
       const value = unlockInput.value
         .trim()
@@ -383,6 +581,7 @@
         .replace(/\s*\.\s*/, '.');
       if (value === 'tell me it mattered') {
         lockScreen.style.display = 'none';
+        localStorage.setItem('siteUnlocked', 'true');
       } else {
         unlockInput.value = '';
         document.getElementById('unlock-error').style.display = 'block';
@@ -401,6 +600,7 @@
 
     unlockInput.addEventListener('change', tryUnlock);
   </script>
+
   <body>
     <div class="glitch-overlay-red"></div>
     <div class="glitch-overlay-color"></div>
@@ -562,6 +762,57 @@
         <div class="caption"></div>
       </div>
     </div>
+
+    <section id="lost-signals-archive">
+      <h2>DEFINITELY NOT AN ARCHIVE</h2>
+      <p style="font-style: normal">
+        Yes, all fragments must be decoded. Unless you figure out the easy
+        way...
+      </p>
+      <div class="puzzle-grid">
+        <div class="puzzle-card" data-puzzle="fragment">
+          <img src="assets/images/decoder.png" alt="Fragment Decoder" />
+          <h3>Fragment Decoder</h3>
+          <div class="puzzle-status"></div>
+        </div>
+        <div class="puzzle-card" data-puzzle="memory">
+          <img src="assets/images/memory.png" alt="REDACTED MEMORY" />
+          <h3>REDACTED MEMORY</h3>
+          <div class="puzzle-status"></div>
+        </div>
+        <div class="puzzle-card" data-puzzle="cipher">
+          <img src="assets/images/file.png" alt="Corrupted File Recovery" />
+          <h3>Corrupted File Recovery</h3>
+          <div class="puzzle-status"></div>
+        </div>
+      </div>
+
+      <div id="puzzle-modal" class="hidden">
+        <div class="modal-content">
+          <span id="close-modal">&times;</span>
+          <div id="puzzle-container"></div>
+        </div>
+      </div>
+
+      <div id="download-link" class="hidden">
+        <a
+          href="https://password.link/W4pnwBQu/#OE1vKn1CX3ZBTllxcEFGYXxZ"
+          target="_blank"
+          download
+          >ACCESS GRANTED: REDEEM… WHATEVER THIS IS</a
+        >
+        <div
+          id="qr-code"
+          style="
+            margin-top: 1rem;
+            border: 1px dashed #c1b57b;
+            padding: 1rem;
+            background: #0f0f0f;
+            display: inline-block;
+          "
+        ></div>
+      </div>
+    </section>
 
     <div class="modal" id="modal">
       <button class="arrow" id="prev">&#9664;</button>
@@ -753,6 +1004,273 @@
           morseOutput.innerHTML = decoded.replace(/ELIAN/g, '<s>ELIAN</s>');
         });
       }
+    </script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        const puzzleCards = document.querySelectorAll('.puzzle-card');
+        const modal = document.getElementById('puzzle-modal');
+        const closeModal = document.getElementById('close-modal');
+        const puzzleContainer = document.getElementById('puzzle-container');
+        const downloadLink = document.getElementById('download-link');
+
+        let puzzlesSolved = {
+          fragment: false,
+          memory: false,
+          cipher: false,
+        };
+
+        const memorySentences = [
+          'The protocol failed silently.',
+          'Memory fragment unstable.',
+          'He was never meant to know.',
+          'Restore what was lost.',
+          'This is not your memory.',
+          'The writer was rewritten.',
+          'Loop detected in fragment.',
+          'Access denied by unknown key.',
+          'Rebuild the timeline.',
+          'You are not the author.',
+          'His name was erased.',
+          'Their story was corrupted.',
+          'One rewrite too many.',
+          'The echo remained.',
+          'What was real is now false.',
+          'Identity mismatch error.',
+          'Memory lock breached.',
+          'The loop is incomplete.',
+          'Truth is buried in code.',
+          'Version control failed.',
+        ];
+
+        let savedProgress = localStorage.getItem('lostSignalsProgress');
+        if (savedProgress) {
+          puzzlesSolved = JSON.parse(savedProgress);
+          updateGrid();
+          checkAllSolved();
+        }
+
+        puzzleCards.forEach((card) => {
+          card.addEventListener('click', () => {
+            const puzzleType = card.dataset.puzzle;
+            if (puzzlesSolved[puzzleType]) return;
+            openPuzzle(puzzleType);
+          });
+        });
+
+        closeModal.addEventListener('click', () => {
+          modal.classList.add('hidden');
+          puzzleContainer.innerHTML = '';
+        });
+
+        function openPuzzle(type) {
+          modal.classList.remove('hidden');
+          puzzleContainer.innerHTML = '';
+
+          let header = document.createElement('h3');
+          header.style.color = '#c1b57b';
+          header.style.marginBottom = '1rem';
+          header.style.fontFamily = 'monospace';
+          puzzleContainer.appendChild(header);
+
+          let errorMsg = document.createElement('p');
+          errorMsg.style.color = 'red';
+          errorMsg.style.fontFamily = 'monospace';
+          errorMsg.style.marginTop = '1rem';
+          errorMsg.style.display = 'none';
+          puzzleContainer.appendChild(errorMsg);
+
+          if (type === 'fragment') {
+            header.textContent = 'MEMORY CORRUPTED';
+
+            let sentence =
+              memorySentences[
+                Math.floor(Math.random() * memorySentences.length)
+              ];
+            let glitched = glitchText(sentence);
+
+            let fragmentDisplay = document.createElement('p');
+            fragmentDisplay.style.fontFamily = 'monospace';
+            fragmentDisplay.style.marginBottom = '1.5rem';
+            fragmentDisplay.style.padding = '0.5rem';
+            fragmentDisplay.style.border = '1px dashed #c1b57b';
+            fragmentDisplay.style.color = '#f8f8f8';
+            fragmentDisplay.style.background = '#1a1a1a';
+            fragmentDisplay.textContent = glitched;
+            puzzleContainer.appendChild(fragmentDisplay);
+
+            let input = document.createElement('input');
+            input.placeholder = 'Type the corrected sentence...';
+            let button = document.createElement('button');
+            button.textContent = 'Submit';
+            button.addEventListener('click', () => {
+              if (normalize(input.value) === normalize(sentence)) {
+                markSolved('fragment');
+              } else {
+                errorMsg.textContent = 'Not even close. Try again.';
+                errorMsg.style.display = 'block';
+              }
+            });
+            puzzleContainer.appendChild(input);
+            puzzleContainer.appendChild(button);
+          } else if (type === 'memory') {
+            header.textContent = 'CODE 13: LSPHU_13';
+
+            const sequence = [];
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'.split('');
+            for (let i = 0; i < 5; i++) {
+              sequence.push(chars[Math.floor(Math.random() * chars.length)]);
+            }
+
+            let display = document.createElement('p');
+            display.style.fontFamily = 'monospace';
+            display.style.marginBottom = '1.5rem';
+            display.style.padding = '0.5rem';
+            display.style.border = '1px dashed #c1b57b';
+            display.style.color = '#f8f8f8';
+            display.style.background = '#1a1a1a';
+            display.textContent = sequence.join(' ');
+            puzzleContainer.appendChild(display);
+
+            setTimeout(() => {
+              display.textContent = '[ MEMORY CORRUPTED ]';
+            }, 3000);
+
+            let input = document.createElement('input');
+            input.placeholder = 'Enter sequence (space separated)';
+            let button = document.createElement('button');
+            button.textContent = 'Submit';
+            button.addEventListener('click', () => {
+              let entered = normalize(input.value).replace(/\s+/g, '');
+              let target = normalize(sequence.join(' ')).replace(/\s+/g, '');
+              if (entered === target) {
+                markSolved('memory');
+              } else {
+                errorMsg.textContent = 'That... wasn’t it. Try again.';
+                errorMsg.style.display = 'block';
+              }
+            });
+            puzzleContainer.appendChild(input);
+            puzzleContainer.appendChild(button);
+          } else if (type === 'cipher') {
+            header.textContent = '/damage/';
+
+            let fileList = [
+              '/log_dump_1.tmp',
+              '/trace_17.err',
+              '/regret.txt',
+              '/memory_backup.bak',
+              '/damage.log',
+              '/ghost_file_404.sys',
+              '/echo_fragment.dat',
+            ];
+
+            fileList = fileList.sort(() => Math.random() - 0.5);
+
+            let listContainer = document.createElement('div');
+            listContainer.style.display = 'flex';
+            listContainer.style.flexDirection = 'column';
+            listContainer.style.alignItems = 'center';
+            listContainer.style.gap = '0.5rem';
+            listContainer.style.marginTop = '1rem';
+            listContainer.style.animation = 'shuffleIn 0.6s ease';
+
+            fileList.forEach((fileName) => {
+              let fileButton = document.createElement('button');
+              fileButton.textContent = fileName;
+              fileButton.style.width = '80%';
+              fileButton.style.textAlign = 'left';
+              fileButton.style.padding = '0.5rem';
+              fileButton.style.fontFamily = 'monospace';
+              fileButton.style.cursor = 'pointer';
+              fileButton.addEventListener('click', () => {
+                if (fileName === '/regret.txt') {
+                  markSolved('cipher');
+                } else {
+                  errorMsg.textContent = 'ACCESS DENIED.';
+                  errorMsg.style.display = 'block';
+                }
+              });
+              listContainer.appendChild(fileButton);
+            });
+
+            puzzleContainer.appendChild(listContainer);
+          }
+        }
+
+        function markSolved(type) {
+          puzzlesSolved[type] = true;
+          localStorage.setItem(
+            'lostSignalsProgress',
+            JSON.stringify(puzzlesSolved)
+          );
+          modal.classList.add('hidden');
+          puzzleContainer.innerHTML = '';
+          updateGrid();
+          checkAllSolved();
+        }
+
+        function updateGrid() {
+          puzzleCards.forEach((card) => {
+            const type = card.dataset.puzzle;
+            const statusDiv = card.querySelector('.puzzle-status');
+            if (puzzlesSolved[type]) {
+              card.classList.add('completed');
+              statusDiv.textContent = '✔ Completed';
+            } else {
+              card.classList.remove('completed');
+              statusDiv.textContent = '';
+            }
+          });
+        }
+
+        function checkAllSolved() {
+          if (Object.values(puzzlesSolved).every((v) => v)) {
+            downloadLink.classList.remove('hidden');
+
+            const qrDiv = document.getElementById('qr-code');
+            qrDiv.innerHTML = `
+      <img src="assets/images/code.png" alt="QR Code to download">
+    `;
+          }
+        }
+
+        function normalize(str) {
+          return str.toLowerCase().replace(/\s+/g, ' ').trim();
+        }
+
+        function glitchText(text) {
+          const glitchChars = [
+            '3',
+            '0',
+            '1',
+            '!',
+            '@',
+            '#',
+            '%',
+            '$',
+            '^',
+            '&',
+            '*',
+            '?',
+            '+',
+            '-',
+            '_',
+            '~',
+          ];
+          return text
+            .split('')
+            .map((char) => {
+              if (Math.random() < 0.2 && /[a-zA-Z0-9]/.test(char)) {
+                return glitchChars[
+                  Math.floor(Math.random() * glitchChars.length)
+                ];
+              } else {
+                return char;
+              }
+            })
+            .join('');
+        }
+      });
     </script>
   </body>
 </html>
