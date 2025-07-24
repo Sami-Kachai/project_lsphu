@@ -90,6 +90,10 @@
         position: relative;
       }
 
+      body.locked {
+        overflow: hidden;
+      }
+
       h1,
       h2 {
         color: #c1b57b;
@@ -534,15 +538,12 @@
       The hallway ahead is locked.<br /><br />
       Only those who are worthy can proceed.
       <br />
-      <span style="font-size: 0.5rem"
-        >JK, this one is easy even for you!, just check the note in Chapter 19.
+      <span style="font-size: 0.5rem">
+        Forget Chapter 19. Just check the <strong>afterword</strong>.
         <br />
-        (Or don’t. It’s actually in the copyright page. I lied. But so did your
-        confidence when you believed me.)
-        <br />
-        While you’re here, maybe glance at the chapter titles again. Do they
-        look... normal to you? You thought I was just tossing glitches around
-        for aesthetic? Cute.</span
+        (Honestly, I couldn’t have made it any easier unless I printed it in
+        bold and circled it myself. Which I basically did, if you’ve been paying
+        attention.)</span
       >
       <br />
       <span style="font-size: 0.3rem"
@@ -568,16 +569,38 @@
       id="unlock-error"
       style="color: red; margin-top: 0.5rem; font-size: 0.85rem; display: none"
     >
-      No shit, Sherlock.
+      Groundbreaking deduction. Truly. We should notify someone.
     </div>
   </div>
 
   <script>
     const lockScreen = document.getElementById('lock-screen');
     const unlockInput = document.getElementById('unlockInput');
+    document.body.classList.add('locked');
+    const errorMessages = [
+      'Groundbreaking deduction. Truly. We should notify someone.',
+      'Genius move. Try again, though.',
+      'Bold guess. Completely wrong.',
+      "That's adorable. Still no.",
+      'You sure you read the book?',
+      '404: Insight not found.',
+      'We regret to inform you… nope.',
+      'Close. If we were grading alphabet soup.',
+      'You’re trying. I’ll give you that.',
+      'Memory mismatch. Please reboot ego.',
+    ];
+
+    function showRandomError() {
+      const msg =
+        errorMessages[Math.floor(Math.random() * errorMessages.length)];
+      const errorDiv = document.getElementById('unlock-error');
+      errorDiv.textContent = msg;
+      errorDiv.style.display = 'block';
+    }
 
     if (localStorage.getItem('siteUnlocked') === 'true') {
       lockScreen.style.display = 'none';
+      document.body.classList.remove('locked');
     }
 
     function tryUnlock() {
@@ -588,15 +611,16 @@
       if (value === 'tell me it mattered') {
         lockScreen.style.display = 'none';
         localStorage.setItem('siteUnlocked', 'true');
+        document.body.classList.remove('locked');
       } else {
         unlockInput.value = '';
-        document.getElementById('unlock-error').style.display = 'block';
+        showRandomError();
         unlockInput.style.border = '1px solid red';
         setTimeout(() => {
           document.getElementById('unlock-error').style.display = 'none';
           unlockInput.placeholder = 'Enter that thing you definitely missed...';
           unlockInput.style.border = '1px solid #444';
-        }, 2000);
+        }, 3000);
       }
     }
 
@@ -893,14 +917,14 @@
       let currentIndex = 0;
       const originalTexts = [
         'Hey, You!',
-        'Bet it tastes better than your life',
-        'Why the long faces?',
-        'Maestro, violin segment, please!',
+        'This has layers. You don’t.',
+        'Did hope crash again or is this just your face?',
+        'Oh no… anyway.',
         'Are you going to clean that up?',
-        "C'mon! stop being a drama queen!",
-        'I spent 12€ on this sandwich',
+        "Relax, you're not the plot twist.",
+        'This sandwich was a filler episode.',
         'Guess who needs a new dishwasher?',
-        'Guess who just won the worst dad of the year award?',
+        'New record: emotionally unavailable at 60 FPS.',
         'Wanna play Bartita?',
       ];
 
